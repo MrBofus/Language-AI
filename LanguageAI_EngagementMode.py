@@ -32,20 +32,11 @@ top_k = 50          #Limit the number of Markhov chains to use
 print('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n')
 print('\n\n==================================================================================================================================')
 print('==================================================================================================================================\n\n')
-print('\t\t\t\t\t\t\tHORROR-BOT\n')
-print('\t\t\t\ta whacky and uncharacteristic tale in a few short clicks\n')
+print('\t\t\t\tHORROR-BOT: Engagement Mode\n')
+print('\t\t\t\ta faster-paced version of regular horror-bot')
 print('\n\n==================================================================================================================================')
 print('==================================================================================================================================\n\n')
-print('\tTo begin, fill in some starting seeds. These sentence fragments will be used to generate a story.')
-print('\tTry something like \"It was a dark and stormy night when suddenly, \"')
-print('\tThe sentence fragment will then be auto-completed using an advanced AI. The longer the starting \n\tseeds, the more \'realistic\' the story will sound.')
-prompt1 = input('\n\nInput starting seed 1: ')
-prompt2 = input('\nInput starting seed 2: ')
-prompt3 = input('\nInput starting seed 3: ')
-prompt4 = input('\nInput starting seed 4: ')
-print('\n\n==================================================================================================================================')
-print('==================================================================================================================================\n\n')
-print('\n\n\t\tProcessing...\n\n')
+print('\n\n\tLoading...\n\n')
 
 ################################################################################
 #Definitions of functions called later in code
@@ -208,7 +199,7 @@ def text_generation(test_data):
 #included pre-trained model--trained on the entire novel of Dracula
 ################################################################################
  
-text_in = open("dracula.txt").read() #Change this to whatever text document to train
+text_in = open("dracula-abridged.txt").read() #Change this to whatever text document to train
                                      #the GPT-2 model on, or leave it as-is to use the
                                      #default.
 text_in = text_in.replace('\n',' ')
@@ -235,39 +226,36 @@ else:
 #Generate the story using the starting seeds and filter the output to look neat
 ################################################################################
 
-start_str = pd.DataFrame({0:[prompt1,
-                             prompt2,
-                             prompt3,
-                             prompt4]})
+while 1:
+    
+    start_str = input('\tInput: ')
+    print('\n\n')
+    start_str = pd.DataFrame({0:[start_str]})
+    generated_story = text_generation(start_str)
 
-print('\t\tGenerating story...\n\n\n\n')
-generated_story = text_generation(start_str)
+    i = 0
+    generated_story_str = '\t'
 
-i = 0
-generated_story_str = '\t'
+    while i < len(generated_story):
+        generated_story_str = generated_story_str + ' ' + str(generated_story[i])
+        i += 1
 
-while i < len(generated_story):
-    generated_story_str = generated_story_str + ' ' + str(generated_story[i])
-    i += 1
+    generated_story = generated_story_str
 
-generated_story = generated_story_str
+    generated_story = generated_story.replace('[\'', '')
+    generated_story = generated_story.replace('[\"','')
+    generated_story = generated_story.replace('\']', '')
+    generated_story = generated_story.replace('\"]','\"')
+    generated_story = generated_story.replace('\\xa0', '')
+    generated_story = generated_story.replace('<|endoftext|>','.')
+    generated_story = generated_story.replace('.,','.')
+    generated_story = generated_story.replace(',.','.')
+    generated_story = generated_story.replace('..','.')
+    generated_story = generated_story.replace('      DRACULA     CHAPTER I  JONATHAN HARKERS JOURN','')
+    generated_story = generated_story.replace('\\n\\n', ' ')
+    generated_story = generated_story.replace('\\n',' ')
+    generated_story = generated_story.replace('.\".', '.\"')
+    generated_story = generated_story.replace('\\\'','\'')
+    generated_story = generated_story.replace('\\\"','\"')
 
-generated_story = generated_story.replace('[\'', '')
-generated_story = generated_story.replace('[\"','')
-generated_story = generated_story.replace('\']', '')
-generated_story = generated_story.replace('\"]','\"')
-generated_story = generated_story.replace('\\xa0', '')
-generated_story = generated_story.replace('<|endoftext|>','.')
-generated_story = generated_story.replace('.,','.')
-generated_story = generated_story.replace(',.','.')
-generated_story = generated_story.replace('..','.')
-generated_story = generated_story.replace('      DRACULA     CHAPTER I  JONATHAN HARKERS JOURN','')
-generated_story = generated_story.replace('\\n\\n', ' ')
-generated_story = generated_story.replace('\\n',' ')
-generated_story = generated_story.replace('.\".', '.\"')
-generated_story = generated_story.replace('\\\'','\'')
-generated_story = generated_story.replace('\\\"','\"')
-
-print('\n\n==================================================================================================================================')
-print('==================================================================================================================================\n\n')      
-print(generated_story + '\n\n')
+    print('\n\n' + generated_story + '\n\n')
