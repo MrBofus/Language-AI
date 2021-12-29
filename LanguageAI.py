@@ -1,4 +1,5 @@
 ################################################################################
+#Import libraries
 ################################################################################
 
 import pandas as pd
@@ -11,15 +12,21 @@ import torch.nn.functional as F
 import os
 
 ################################################################################
+#Defining some variables
 ################################################################################
 
-TRAIN_ON_RUN = 0
+TRAIN_ON_RUN = 0 #Training takes a very long time--multiple days of continuous running.
+                 #Train the model on a text document called 'text_in' later in the code.
 
-max_length = 1024
-temp = 0.95
-top_k = 50
+max_length = 1024   #Max length of strings taken in by GPT-2 Model. 
+temp = 0.95         #How 'creative' the story is. The lower the number, the more likely
+                    #to get stuck in a text loop. The higher the number the more random and
+                    #disjointed the story is.
+top_k = 50          #Limit the number of Markhov chains to use
 
 ################################################################################
+#Printing material, including explanation of code and getting starting seeds
+#for story to generate around
 ################################################################################
 
 print('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n')
@@ -41,6 +48,7 @@ print('=========================================================================
 print('\n\n\t\tProcessing...\n\n')
 
 ################################################################################
+#Definitions of functions called later in code
 ################################################################################
 
 class storydata(Dataset):  
@@ -196,11 +204,13 @@ def text_generation(test_data):
   return generated_lyrics
 
 ################################################################################
+#If training, prepare the text to go into the GPT-2 model. Otherwise, recall the 
+#included pre-trained model--trained on the entire novel of Dracula
 ################################################################################
-
-dracula = open("dracula.txt").read()
-    
-text_in = dracula
+ 
+text_in = open("dracula.txt").read() #Change this to whatever text document to train
+                                     #the GPT-2 model on, or leave it as-is to use the
+                                     #default.
 text_in = text_in.replace('\n',' ')
 text_in = text_in.replace('\xa0','')
     
@@ -219,9 +229,10 @@ if TRAIN_ON_RUN:
     model = train(dataset, model, tokenizer)
 
 else:  
-    model = torch.load('model.pt')
+    model = torch.load('model.pt') #Saved model, trained on the entire novel of Dracula
     
 ################################################################################
+#Generate the story using the starting seeds and filter the output to look neat
 ################################################################################
 
 start_str = pd.DataFrame({0:[prompt1,
