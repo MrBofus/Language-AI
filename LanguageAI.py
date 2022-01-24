@@ -15,8 +15,8 @@ import os
 #Defining some variables
 ################################################################################
 
-TRAIN_ON_RUN = 0 #Training takes a very long time--multiple days of continuous running.
-                 #Train the model on a text document called 'text_in' later in the code.
+TRAIN_ON_RUN = 0    #Training takes a very long time--multiple days of continuous running.
+                    #Train the model on a text document called 'text_in' later in the code.
 
 max_length = 1024   #Max length of strings taken in by GPT-2 Model. 
 temp = 0.95         #How 'creative' the story is. The lower the number, the more likely
@@ -81,16 +81,29 @@ def pack_tensor(new_tensor, packed_tensor, max_seq_len):
         return packed_tensor, True, None
 
 def train(
-    dataset, model, tokenizer,
-    batch_size=16, epochs=5, lr=2e-5,
-    max_seq_len=400, warmup_steps=200,
-    gpt2_type="gpt2", output_dir=".", output_prefix="wreckgar",
-    test_mode=False,save_model_on_epoch=False,
+    dataset, 
+    model, 
+    tokenizer,
+    batch_size=16, 
+    epochs=5, 
+    lr=2e-5,
+    max_seq_len=400, 
+    warmup_steps=200,
+    gpt2_type="gpt2", 
+    output_dir=".", 
+    output_prefix="wreckgar",
+    test_mode=False, 
+    save_model_on_epoch=False,
 ):
-    device=torch.device("cpu")
-    model = model.cpu()
+    
+    if torch.cuda.is_available() == 1:
+        device = torch.device("cuda")
+        model = model.to("cuda")  
+    else:
+        device = torch.device("cpu")
+        model = model.to("cpu")
+        
     model.train()
-
     optimizer = AdamW(model.parameters(), lr=lr)
     scheduler = get_linear_schedule_with_warmup(
         optimizer, num_warmup_steps=warmup_steps, num_training_steps=-1
@@ -107,7 +120,7 @@ def train(
         print(loss)
         for idx, entry in tqdm(enumerate(train_dataloader)):
             (input_tensor, carry_on, remainder) = pack_tensor(entry, input_tensor, 768)
-
+            print(torch.cuda.memory_allocated()/1024/1024/1024)
             if carry_on and idx != len(train_dataloader) - 1:
                 continue
 
@@ -130,7 +143,6 @@ def train(
                 os.path.join(output_dir, f"{output_prefix}-{epoch}.pt"),
             )
     return model
-
 
 def generate(
     model,

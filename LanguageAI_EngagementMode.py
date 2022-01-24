@@ -15,8 +15,8 @@ import os
 #Defining some variables
 ################################################################################
 
-TRAIN_ON_RUN = 0 #Training takes a very long time--multiple days of continuous running.
-                 #Train the model on a text document called 'text_in' later in the code.
+TRAIN_ON_RUN = 0    #Training takes a very long time--multiple days of continuous running.
+                    #Train the model on a text document called 'text_in' later in the code.
 
 max_length = 1024   #Max length of strings taken in by GPT-2 Model. 
 temp = 0.95         #How 'creative' the story is. The lower the number, the more likely
